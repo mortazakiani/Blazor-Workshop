@@ -352,7 +352,7 @@ EOF
 helm install pizza-app ./$CHART_NAME
 
 echo "Helm chart created and deployed successfully!"
-
+git pull https://github.com/mortazakiani/Blazor-Workshop/blob/main/before-instation.sh
 chmod +x before-instation.sh
 ./before-instation.sh
 
