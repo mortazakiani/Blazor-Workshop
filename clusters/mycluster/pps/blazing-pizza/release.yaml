@@ -1,0 +1,32 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: blazing-pizza
+  namespace: default
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ./charts/blazing-pizza
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+      interval: 1m
+  values:
+    replicaCount: 1
+    image:
+      frontend: mortazakiani/pizza-frontend:v1
+      backend: mortazakiani/pizza-backebnd:v1
+    environment: Production
+    service:
+      frontend:
+        port: 80
+      backend:
+        port: 8080
+    ingress:
+      enabled: true
+      host: mortezakianitadi.maxtld.dev
+      path:
+        frontend: /frontend
+        backend: /endpoints

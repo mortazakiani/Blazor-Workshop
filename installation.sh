@@ -199,7 +199,7 @@ export GITHUB_USER=mortazakiani
 flux bootstrap github --owner=$GITHUB_USER --repository=fluxcd --branch=master --path=clusters/my-cluster --personal
 
 
-#!/bin/bash
+
 
 # Set chart name
 CHART_NAME="pizza-chart"
@@ -351,6 +351,44 @@ EOF
 # Install the Helm chart
 helm install pizza-app ./$CHART_NAME
 
+cp pizza-chart/*  clustes/mycluster 
+
+git add .
+git commit -m "Add Blazing Pizza Helm chart to FluxCD"
+git push origin master
+
+cat <<EOF > fluxcd-$CHART_NAME.yaml
+
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: blazing-pizza
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: ./charts/blazing-pizza
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+  valuesFrom:
+  - kind: ConfigMap
+    name: blazing-pizza-values
+EOF
+cat <<EOF > fluxcd-$CHART_NAME-noti.yaml
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
+kind: Alert
+metadata:
+  name: blazing-pizza-alerts
+  namespace: flux-system
+spec:
+  eventSeverity: info
+  eventSources:
+    - kind: HelmRelease
+      name: blazing-pizza
+  providerRef:
+    name: slack
+EOF
 echo "Helm chart created and deployed successfully!"
 git pull https://github.com/mortazakiani/Blazor-Workshop/blob/main/before-instation.sh
 chmod +x before-instation.sh
